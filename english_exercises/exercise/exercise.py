@@ -12,4 +12,3 @@ class Exercise:
     description: str
 
 
-

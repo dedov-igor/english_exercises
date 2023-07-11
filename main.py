@@ -1,16 +1,34 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import argparse
+import logging
+from pathlib import Path
 
 
-# Press the green button in the gutter to run the script.
+import attr
+
+import pandas as pd
+import spacy
+import pyinflect
+
+from english_exercises.data.create_exercises_dataset import create_exercises_dataset
+from english_exercises.data.load_dataset import load_data
+
+
+def main():
+    logging.basicConfig(level=logging.INFO)
+    argparser = argparse.ArgumentParser()
+    model = spacy.load('en_core_web_sm')
+    argparser.add_argument('--text', type=str)
+    argparser.add_argument('--output', type=str)
+    args = argparser.parse_args()
+    path = Path(args.text).expanduser()
+    output = Path(args.output).expanduser()
+    sentences = load_data(path, model)
+    exercises = create_exercises_dataset(sentences)
+    df = pd.DataFrame(attr.asdict(e) for e in exercises)
+
+    df.to_csv(output, index=False)
+
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    main()
