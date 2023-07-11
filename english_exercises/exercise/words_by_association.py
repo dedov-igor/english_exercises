@@ -19,11 +19,10 @@ def create_associations(model, token: Token):
 def create_wordnet_associations(token: Token):
     associations = set()
     for e in wordnet.synsets(token.text):  # дополнительный поиск с помощью wordnet
-        for syn in e.lemma_names():
-            associations.update(syn)
-        for i in e.lemmas():
-            if i.antonyms():  # check whether the antonyms for the given word are available or not
-                associations.add(i.antonyms()[0].name())  # антонимы тоже могут быть ассоциациями
+        for syn in e.lemmas():
+            associations.update([syn.name()])
+            if syn.antonyms(): # check whether the antonyms for the given word are available or not
+                associations.add(syn.antonyms()[0].name()) # антонимы тоже могут быть ассоциациями
     return associations
 
 def delete_cognates(association_words_set, token: Token):
@@ -37,10 +36,11 @@ def delete_cognates(association_words_set, token: Token):
 def words_by_association(sentences: list[Span], model):
     # Упражнение: подобрать ассоциации к слову
     exercise_association = []
+    token_set = set()
 
     for s in sentences:
         for token in s:
-            if token.pos_ in ['NOUN', 'VERB'] and not (token.text.istitle()) and len(token.text) > 4:
+            if token.pos_ in ['NOUN', 'VERB'] and not (token.text.istitle()) and len(token.text) > 4 and token.text not in token_set:
                 # ассоциаций в списке должно быть много, чтобы не пришлось угадывать слово из небольшого списка
                 association_words_set = create_wordnet_associations(token) | create_associations(model, token) # множество всех ассоциаций к слову
                 association_words_set = delete_cognates(association_words_set, token)
@@ -54,6 +54,7 @@ def words_by_association(sentences: list[Span], model):
                     Exercise(s.text, 'missing_word', s.text,
                              [], association_words_set, f'Подберите ассоциацию к слову {token.text}')
                 )
+                token_set.add(token.text)
 
                 break  # одно упражнение на одно предложение
     logging.info(f'Количество созданных упражнений {len(exercise_association)}')
