@@ -40,7 +40,7 @@ def words_by_association(sentences: list[Span], model):
 
     for s in sentences:
         for token in s:
-            if token.pos_ in ['NOUN', 'VERB'] and not (token.text.istitle()) and len(token.text) > 4 and token.text not in token_set:
+            if token.pos_ in ['NOUN', 'VERB'] and not (token.text.istitle()) and len(token.text) > 4 and token.text not in token_set and token.text[-1] not in ['s', 'd']:
                 # ассоциаций в списке должно быть много, чтобы не пришлось угадывать слово из небольшого списка
                 association_words_set = create_wordnet_associations(token) | create_associations(model, token) # множество всех ассоциаций к слову
                 association_words_set = delete_cognates(association_words_set, token)
