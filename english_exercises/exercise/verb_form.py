@@ -6,7 +6,7 @@ from spacy.tokens import Span
 from english_exercises.exercise.exercise import Exercise
 from english_exercises.util import replace_word
 
-INFLECTIONS = ['VBP', 'VBZ', 'VBG', 'VBD']
+INFLECTIONS = ['VB', 'VBP', 'VBZ', 'VBG', 'VBD']
 
 DESCRIPTION = 'Выберите слово'
 
